@@ -9,7 +9,8 @@ import urllib.parse
 import math
 from collections import Counter
 import string
-import sys
+# import sys
+import os
 
 # Import : External
 import requests
@@ -323,17 +324,55 @@ def extract_features(url) :
 
     return features
 
+# # Main
+# if __name__ == "__main__" :
+#     # Input : URL
+#     if len(sys.argv) != 2 :
+
+#         print("How to Use : python3 feature.py < URL >")
+
+#         sys.exit(1)
+    
+#     input_url = sys.argv[1]
+
+#     features = extract_features(input_url)
+    
+#     print(f"{features}")
+
 # Main
 if __name__ == "__main__" :
-    # Input : URL
-    if len(sys.argv) != 2 :
+    base_directory = os.path.dirname(os.path.abspath(__file__))
+    after_refine_directory = os.path.join(base_directory, 'data', 'after_refine')
 
-        print("How to Use : python3 feature.py < URL >")
+    result_file_path = os.path.join(base_directory, 'feature_result.txt') # Result File
 
-        sys.exit(1)
-    
-    input_url = sys.argv[1]
+    with open(result_file_path, "w", encoding="utf-8") as result_file :
 
-    features = extract_features(input_url)
-    
-    print(f"{features}")
+        for filename in os.listdir(after_refine_directory) :
+            if filename.endswith(".txt") :
+                file_path = os.path.join(after_refine_directory, filename)
+
+                print(f"\n[ + ] File : {filename}")
+
+                with open(file_path, "r", encoding="utf-8") as file :
+                    url_list = [line.strip() for line in file if line.strip()]
+
+                for index, url in enumerate(url_list) :
+                    result_file.write(f"[ URL ] {url}\n")
+
+                    try :
+                        features = extract_features(url)
+
+                        for key, value in features.items() :
+                            result_file.write(f"{key} : {value}\n")
+
+                    except Exception as e :
+                        result_file.write(f"[ ERROR ] {e}\n")
+                    
+                    result_file.write("\n")
+
+                    # print(f"  - [ {index+1} / {len(url_list)} ] URL : {url}")
+
+                    # features = extract_features(url)
+
+                    # print(f"    => Features : {features}")
